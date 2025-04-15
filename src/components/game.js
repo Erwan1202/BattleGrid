@@ -9,7 +9,7 @@ import CommandParser from "./commandParseur.js";
 export default class Game {
     constructor(width, height, playerName) {
         this.map = new GameMap(width, height);
-        this.players = [new Player(playerName, 0, 0)];
+        this.players = [new Player(playerName, 1)];
         this.currentPlayerIndex = 0;
         this.gameOver = false;
         this.turn = 1;
@@ -75,9 +75,8 @@ export default class Game {
         return this.players[this.currentPlayerIndex];
     }
 
-    init(){
+    init() {
         console.log("Initialisation du jeu...");
-        this.map.printMap();
     
         const player = this.players[0];
         const all = this.map.getAllTerritories();
@@ -86,6 +85,15 @@ export default class Game {
         rand.changeOwner(player);
         rand.addUnits(5);
         player.addTerritory(rand);
+    
+        // Initialisation des bots
+        this.bots.forEach(bot => {
+            const available = this.map.getAllTerritories().filter(t => t.owner === null);
+            const pos = available[Math.floor(Math.random() * available.length)];
+            pos.changeOwner(bot);
+            pos.addUnits(3);
+            bot.addTerritory(pos);
+        });
     
         this.players.forEach(p => {
             console.log(`Joueur: ${p.name}`);
@@ -96,6 +104,7 @@ export default class Game {
             console.log(`Bot: ${bot.name}`);
         });
     
+        this.map.printMap();
         console.log("Jeu prêt à commencer !");
     }
     

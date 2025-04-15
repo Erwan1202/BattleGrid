@@ -4,9 +4,11 @@ export default class Player {
         this.id = id;
         this.territories = [];
 
-        this.biomass = Math.floor(Math.random*1000); // unités de croissance
-        this.resources = Math.floor(Math.random*1000); // énergie / nutriments
-        this.gold = Math.floor(Math.random*100); // pour la construction
+        this.biomass = 100; // unités de croissance
+        this.resources = 100; // énergie / nutriments
+        this.gold = 100; // pour la construction
+
+        console.log("Création du joueur : " , this);
     }
 
     addTerritory(territory) {
