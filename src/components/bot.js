@@ -13,6 +13,11 @@ export default class Bot extends Player {
 
     game_logic() {
         console.log("Bot logic executed");
+        const t = this.territories[0];
+        if (t) {
+            t.addUnits(5);
+            this.army += 5;
+            console.log(`[BOT ${this.name}] renforce le territoire (${t.x},${t.y})`);
+        }
     }
-
 }

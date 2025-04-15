@@ -8,46 +8,22 @@ export default class Player {
         this.gold = Math.floor(Math.random() * 1000)+1;
     }
     
-    getName() {
-        return this.name;
-    }
-    
-    getPosX() {
-        return this.pos_x;
+    addTerritory(territory) {
+        this.territories.push(territory);
     }
 
-    getPosY() {
-        return this.pos_y;
+    removeTerritory(territory) {
+        this.territories = this.territories.filter(t => t !== territory);
     }
 
-    setPosX(pos_x) {
-        this.pos_x = pos_x;
+    collectIncome() {
+        const income = this.territories.length * 10;
+        this.resources += income;
+        this.gold += Math.floor(income / 2);
+        return income;
     }
 
-    setPosY(pos_y) {
-        this.pos_y = pos_y;
-    }
-
-    getArmy() {
-        return this.army;
-    }
-
-    setArmy(army) {
-
-        this.army = army;
-    }
-
-    getResources() {
-        return this.resources;
-    }
-
-    setResources(resources) {
-        this.resources = resources;
-    }
-    getGold() {
-        return this.gold;
-    }
-    setGold(gold) {
-        this.gold = gold;
+    toString() {
+        return `${this.name} (Ressources: ${this.resources}, Or: ${this.gold}, Armée: ${this.army})`;
     }
 }
