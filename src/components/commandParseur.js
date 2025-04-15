@@ -26,6 +26,7 @@ export default class CommandParser {
                     player.addTerritory(target);
                     player.resources -= 10;
                     console.log(`🌱 Expansion réussie vers (${x}, ${y})`);
+                    map.printMap();
                 } else {
                     console.log("❌ Pas assez d’énergie pour se propager.");
                 }
@@ -39,7 +40,8 @@ export default class CommandParser {
                     if (player.gold >= 50) {
                         player.gold -= 50;
                         cell.buildCity();
-                        console.log(`🏡 Structure créée à (${x},${y})`);
+                        console.log(`🏛️ Structure créée à (${x},${y})`);
+                        map.printMap();
                     } else {
                         console.log("❌ Pas assez d’or.");
                     }
@@ -53,7 +55,7 @@ export default class CommandParser {
                 console.log(player.toString());
                 console.log("🌍 Colonies :");
                 player.territories.forEach(t => {
-                    console.log(`  - (${t.x},${t.y}) : ${t.army} biomasse${t.city ? " 🏡" : ""}`);
+                    console.log(`  - (${t.x},${t.y}) : ${t.army} biomasse${t.city ? " 🏛️" : ""}`);
                 });
                 break;
             }
