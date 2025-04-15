@@ -31,8 +31,11 @@ export default class GameMap {
 
     printMap() {
         console.log("\n🗺️  Carte actuelle :");
+        let header = "   ";
+        for (let x = 0; x < this.width; x++) header += x + "  ";
+        console.log(header);
         for (let y = 0; y < this.height; y++) {
-            let row = "";
+            let row = y + " |";
             for (let x = 0; x < this.width; x++) {
                 const cell = this.grid[y][x];
                 if (cell.owner) {
