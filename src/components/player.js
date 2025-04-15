@@ -1,13 +1,14 @@
 export default class Player {
-    constructor(name, pos_x, pos_y) {
+    constructor(name, id) {
         this.name = name;
-        this.pos_x = pos_x;
-        this.pos_y = pos_y;
-        this.army = Math.floor(Math.random() * 1000)+1;
-        this.resources = Math.floor(Math.random() * 1000)+1;
-        this.gold = Math.floor(Math.random() * 1000)+1;
+        this.id = id;
+        this.territories = [];
+
+        this.biomass = 50; // unités biologiques (à la place de army)
+        this.resources = 100; // énergie / nutriments
+        this.gold = 50; // reste comme monnaie spéciale (pour bâtiments)
     }
-    
+
     addTerritory(territory) {
         this.territories.push(territory);
     }
@@ -17,13 +18,19 @@ export default class Player {
     }
 
     collectIncome() {
-        const income = this.territories.length * 10;
-        this.resources += income;
-        this.gold += Math.floor(income / 2);
-        return income;
+        const n = this.territories.length;
+        const energyGain = n * 10;
+        const goldGain = Math.floor(n * 2);
+        const biomassGain = Math.floor(n * 5);
+
+        this.resources += energyGain;
+        this.gold += goldGain;
+        this.biomass += biomassGain;
+
+        console.log(`🧬 ${this.name} a absorbé : +${energyGain} énergie, +${biomassGain} biomasse, +${goldGain} or`);
     }
 
     toString() {
-        return `${this.name} (Ressources: ${this.resources}, Or: ${this.gold}, Armée: ${this.army})`;
+        return `${this.name} — Biomasse : ${this.biomass}, Énergie : ${this.resources}, Or : ${this.gold}`;
     }
 }

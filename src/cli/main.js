@@ -1,6 +1,6 @@
 /* eslint-env node */
 
-import Game from "../game.js";
+import Game from "../components/game.js";
 import promptSync from "prompt-sync";
 
 const prompt = promptSync(); // Initialisation de prompt-sync

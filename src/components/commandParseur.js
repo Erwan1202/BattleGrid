@@ -11,19 +11,34 @@ export default class CommandParser {
         const map = this.game.map;
 
         switch (command) {
-            case "move": {
-                const [x1, y1, x2, y2] = args.map(Number);
-                const from = map.getTerritory(x1, y1);
-                const to = map.getTerritory(x2, y2);
-                if (from && to && from.owner === player && from.army > 0) {
-                    const moved = Math.min(from.army, 5); // tu peux ajuster
-                    from.removeUnits(moved);
-                    to.addUnits(moved);
-                    to.changeOwner(player);
-                    player.addTerritory(to);
-                    console.log(`👣 Déplacement de ${moved} unités de (${x1},${y1}) vers (${x2},${y2})`);
+
+            case "spread": {
+                const [x, y] = args.map(Number);
+                const target = map.getTerritory(x, y);
+                if (!target) {
+                    console.log("❌ Territoire invalide.");
+                    break;
+                }
+
+                const isAdjacent = map.getNeighbours(x, y).some(n => n.owner === player);
+                if (!isAdjacent) {
+                    console.log("❌ Ce territoire n'est pas adjacent à ta colonie.");
+                    break;
+                }
+
+                if (target.owner === player) {
+                    console.log("❌ Tu contrôles déjà ce territoire.");
+                    break;
+                }
+
+                if (player.resources >= 10) {
+                    target.changeOwner(player);
+                    target.addUnits(1);
+                    player.addTerritory(target);
+                    player.resources -= 10;
+                    console.log(`🌱 Expansion réussie vers (${x}, ${y})`);
                 } else {
-                    console.log("❌ Déplacement impossible.");
+                    console.log("❌ Pas assez d’énergie pour se propager.");
                 }
                 break;
             }
@@ -35,21 +50,34 @@ export default class CommandParser {
                     if (player.gold >= 50) {
                         player.gold -= 50;
                         cell.buildCity();
-                        console.log(`🏛️ Ville construite à (${x},${y})`);
+                        console.log(`🏛️ Structure créée à (${x},${y})`);
                     } else {
                         console.log("❌ Pas assez d’or.");
                     }
                 } else {
-                    console.log("❌ Construction impossible.");
+                    console.log("❌ Construction impossible à cet endroit.");
                 }
                 break;
             }
+
+            case "status": {
+                console.log(player.toString());
+                console.log("🌍 Colonies :");
+                player.territories.forEach(t => {
+                    console.log(`  - (${t.x},${t.y}) : ${t.army} biomasse${t.city ? " 🏛️" : ""}`);
+                });
+                break;
+            }
+
+            case "move":
+                console.log("❌ Le Physarum ne se déplace pas. Utilise plutôt `spread x y`.");
+                break;
 
             case "end":
                 return "end";
 
             default:
-                console.log("Commande inconnue.");
+                console.log("❓ Commande inconnue. Essaie `spread`, `build`, `status`, `end`.");
         }
 
         return "continue";

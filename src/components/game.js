@@ -1,9 +1,10 @@
-import GameMap from "./map";
+import GameMap from "./map.js";
 //import Territory from "./territory";
-import Player from "./player";
-import Bot from "./bot";
+import Player from "./player.js";
+import Bot from "./bot.js";
 //import readline from "readline";
-//import CommandParser from "./commandParser.js";
+import CommandParser from "./commandParseur.js";
+
 
 export default class Game {
     constructor(width, height, playerName) {
@@ -73,4 +74,25 @@ export default class Game {
     getCurrentPlayer() {
         return this.players[this.currentPlayerIndex];
     }
+
+    init(){
+        // Initialisation du jeu
+        console.log("Initialisation du jeu...");
+        this.map.printMap();
+        this.players.forEach(player => {
+            console.log(`Joueur: ${player.name}, Position: (${player.pos_x}, ${player.pos_y})`);
+        });
+        console.log("Bots initialisés:");
+        this.bots.forEach(bot => {
+            console.log(`Bot: ${bot.name}, Position: (${bot.pos_x}, ${bot.pos_y})`);
+        });
+        console.log("Jeu prêt à commencer !");
+
+    }
+
+    executeCommand(cmd) {
+        const parser = new CommandParser(this);
+        return parser.execute(cmd);
+    }
+    
 }
