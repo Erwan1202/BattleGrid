@@ -1,7 +1,9 @@
 import GameMap from "./map";
-import Territory from "./territory";
+//import Territory from "./territory";
 import Player from "./player";
 import Bot from "./bot";
+//import readline from "readline";
+//import CommandParser from "./commandParser.js";
 
 export default class Game {
     constructor(width, height, playerName) {
@@ -11,7 +13,7 @@ export default class Game {
         this.gameOver = false;
         this.turn = 1;
         this.bots = [];
-        this.initBots(3); // Initialize 3 bots
+        this.initBots(3); 
     }
 
     initBots(numBots) {
