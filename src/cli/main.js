@@ -8,14 +8,14 @@ const prompt = promptSync(); // Initialisation de prompt-sync
 const game = new Game(5, 5, "Erwan");
 game.init();
 
-function promptPlayer() {
+function playTurn() {
     const player = game.getCurrentPlayer();
 
     if (player instanceof Bot) {
         game.botTurn(player);
         game.currentPlayerIndex = (game.currentPlayerIndex + 1) % game.players.length;
         if (game.currentPlayerIndex === 0) game.turn++;
-        setTimeout(() => game.playTurn(), 1000);
+        setTimeout(playTurn, 1000);
     } else {
         const cmd = prompt(`🧠 [${player.name}] Commande > `);
         const result = game.executeCommand(cmd.trim());
@@ -23,11 +23,11 @@ function promptPlayer() {
         if (result === "end") {
             game.currentPlayerIndex = (game.currentPlayerIndex + 1) % game.players.length;
             if (game.currentPlayerIndex === 0) game.turn++;
-            game.playTurn(); // 🚀 déclenche le tour des bots
+            setTimeout(playTurn, 1000);
         } else {
-            promptPlayer(); // attendre une autre commande
+            playTurn();
         }
     }
 }
 
-promptPlayer();
+playTurn();

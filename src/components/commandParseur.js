@@ -60,6 +60,15 @@ export default class CommandParser {
                 break;
             }
 
+            case "help":
+                console.log("📜 Commandes disponibles :");
+                console.log(" - spread x y : étendre ton territoire");
+                console.log(" - build x y : construire une ville");
+                console.log(" - status : voir ton état actuel");
+                console.log(" - end : terminer ton tour");
+                break;
+
+
             case "move":
                 console.log("❌ Le Physarum ne se déplace pas. Utilise plutôt `spread x y`.");
                 break;

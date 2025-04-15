@@ -44,7 +44,12 @@ export default class Game {
     
         if (currentPlayer instanceof Player) {
             this.map.printMap();
-            console.log(`[${currentPlayer.name}] Commande attendue...`);
+            if (currentPlayer instanceof Player) {
+                this.map.printMap();
+                console.log(`🧠 [${currentPlayer.name}] à toi de jouer.`);
+                return;
+            }
+            
             return; // attendre commande utilisateur
         }
     
