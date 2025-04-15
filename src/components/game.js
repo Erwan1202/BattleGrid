@@ -39,28 +39,24 @@ export default class Game {
 
     playTurn() {
         const currentPlayer = this.players[this.currentPlayerIndex];
-        console.log(`Tour ${this.turn}: C'est au tour de ${currentPlayer.name}`);
+        console.log(`\n🎲 Tour ${this.turn} — ${currentPlayer.name}`);
         currentPlayer.collectIncome();
-        this.map.printMap();
-
-        // Player logic
+    
         if (currentPlayer instanceof Player) {
-            this.playerLogic(currentPlayer);
-        } else if (currentPlayer instanceof Bot) {
-            currentPlayer.game_logic();
+            this.map.printMap();
+            console.log(`[${currentPlayer.name}] Commande attendue...`);
+            return; // attendre commande utilisateur
         }
-
-        // Check for game over condition
-        if (this.checkGameOver()) {
-            this.gameOver = true;
-            console.log("Jeu terminé !");
-            return;
+    
+        if (this.bots.includes(currentPlayer)) {
+            this.botTurn(currentPlayer);
         }
-
-        // Switch to the next player
+    
         this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.players.length;
+        if (this.currentPlayerIndex === 0) this.turn++;
+        setTimeout(() => this.playTurn(), 1000);
     }
-
+    
     playerLogic(player) {
         // Placeholder for player logic (e.g., move, attack, etc.)
         console.log(`[${player.name}] Tour ${this.turn}: Logique du joueur exécutée`);
@@ -107,6 +103,45 @@ export default class Game {
         this.map.printMap();
         console.log("Jeu prêt à commencer !");
     }
+
+    botTurn(bot) {
+        console.log(`🤖 ${bot.name} réfléchit...`);
+        bot.collectIncome();
+        const map = this.map;
+    
+        let expanded = false;
+        for (const t of bot.territories) {
+            const neighbors = map.getNeighbours(t.x, t.y).filter(n => !n.owner);
+            if (neighbors.length && bot.resources >= 10) {
+                const choice = neighbors[Math.floor(Math.random() * neighbors.length)];
+                choice.changeOwner(bot);
+                choice.addUnits(1);
+                bot.addTerritory(choice);
+                bot.resources -= 10;
+                console.log(`🤖 ${bot.name} étend son territoire vers (${choice.x},${choice.y})`);
+                expanded = true;
+                break;
+            }
+        }
+    
+        if (!expanded) {
+            console.log(`🤖 ${bot.name} ne trouve pas d'endroit à étendre.`);
+        }
+    
+        // Essaye de construire une ville
+        for (const t of bot.territories) {
+            if (!t.city && bot.gold >= 50) {
+                t.buildCity();
+                bot.gold -= 50;
+                console.log(`🏗️ ${bot.name} construit une ville à (${t.x}, ${t.y})`);
+                break;
+            }
+        }
+    
+        map.printMap();
+    }
+
+
     
 
     executeCommand(cmd) {

@@ -2,26 +2,32 @@
 
 import Game from "../components/game.js";
 import promptSync from "prompt-sync";
-
+import Bot from "../components/bot.js";
 const prompt = promptSync(); // Initialisation de prompt-sync
 
 const game = new Game(5, 5, "Erwan");
 game.init();
 
 function promptPlayer() {
-  const player = game.getCurrentPlayer();
-  if (player.isBot) {
-    player.game_logic(game);
-    game.nextTurn();
-    promptPlayer();
-  } else {
-    const cmd = prompt(`🧠 [${player.name}] Commande > `);
-    const result = game.executeCommand(cmd.trim());
-    if (result === "end") {
-      game.nextTurn();
+    const player = game.getCurrentPlayer();
+
+    if (player instanceof Bot) {
+        game.botTurn(player);
+        game.currentPlayerIndex = (game.currentPlayerIndex + 1) % game.players.length;
+        if (game.currentPlayerIndex === 0) game.turn++;
+        setTimeout(() => game.playTurn(), 1000);
+    } else {
+        const cmd = prompt(`🧠 [${player.name}] Commande > `);
+        const result = game.executeCommand(cmd.trim());
+
+        if (result === "end") {
+            game.currentPlayerIndex = (game.currentPlayerIndex + 1) % game.players.length;
+            if (game.currentPlayerIndex === 0) game.turn++;
+            game.playTurn(); // 🚀 déclenche le tour des bots
+        } else {
+            promptPlayer(); // attendre une autre commande
+        }
     }
-    promptPlayer();
-  }
 }
 
 promptPlayer();
