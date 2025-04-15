@@ -63,12 +63,10 @@ export default class Game {
     }
     
     playerLogic(player) {
-        // Placeholder for player logic (e.g., move, attack, etc.)
         console.log(`[${player.name}] Tour ${this.turn}: Logique du joueur exécutée`);
     }
 
     checkGameOver() {
-        // Placeholder for game over condition (e.g., one player left)
         return this.players.filter(p => p.territories.length > 0).length <= 1;
     }
 
