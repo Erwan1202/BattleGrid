@@ -76,19 +76,29 @@ export default class Game {
     }
 
     init(){
-        // Initialisation du jeu
         console.log("Initialisation du jeu...");
         this.map.printMap();
-        this.players.forEach(player => {
-            console.log(`Joueur: ${player.name}, Position: (${player.pos_x}, ${player.pos_y})`);
+    
+        const player = this.players[0];
+        const all = this.map.getAllTerritories();
+        const empty = all.filter(t => t.owner === null);
+        const rand = empty[Math.floor(Math.random() * empty.length)];
+        rand.changeOwner(player);
+        rand.addUnits(5);
+        player.addTerritory(rand);
+    
+        this.players.forEach(p => {
+            console.log(`Joueur: ${p.name}`);
         });
+    
         console.log("Bots initialisés:");
         this.bots.forEach(bot => {
-            console.log(`Bot: ${bot.name}, Position: (${bot.pos_x}, ${bot.pos_y})`);
+            console.log(`Bot: ${bot.name}`);
         });
+    
         console.log("Jeu prêt à commencer !");
-
     }
+    
 
     executeCommand(cmd) {
         const parser = new CommandParser(this);

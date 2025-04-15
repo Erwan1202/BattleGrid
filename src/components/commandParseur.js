@@ -11,25 +11,14 @@ export default class CommandParser {
         const map = this.game.map;
 
         switch (command) {
-
             case "spread": {
                 const [x, y] = args.map(Number);
                 const target = map.getTerritory(x, y);
-                if (!target) {
-                    console.log("❌ Territoire invalide.");
-                    break;
-                }
+                if (!target) return console.log("❌ Territoire invalide.");
 
                 const isAdjacent = map.getNeighbours(x, y).some(n => n.owner === player);
-                if (!isAdjacent) {
-                    console.log("❌ Ce territoire n'est pas adjacent à ta colonie.");
-                    break;
-                }
-
-                if (target.owner === player) {
-                    console.log("❌ Tu contrôles déjà ce territoire.");
-                    break;
-                }
+                if (!isAdjacent) return console.log("❌ Ce territoire n'est pas adjacent à ta colonie.");
+                if (target.owner === player) return console.log("❌ Tu contrôles déjà ce territoire.");
 
                 if (player.resources >= 10) {
                     target.changeOwner(player);
@@ -50,7 +39,7 @@ export default class CommandParser {
                     if (player.gold >= 50) {
                         player.gold -= 50;
                         cell.buildCity();
-                        console.log(`🏛️ Structure créée à (${x},${y})`);
+                        console.log(`🏡 Structure créée à (${x},${y})`);
                     } else {
                         console.log("❌ Pas assez d’or.");
                     }
@@ -64,7 +53,7 @@ export default class CommandParser {
                 console.log(player.toString());
                 console.log("🌍 Colonies :");
                 player.territories.forEach(t => {
-                    console.log(`  - (${t.x},${t.y}) : ${t.army} biomasse${t.city ? " 🏛️" : ""}`);
+                    console.log(`  - (${t.x},${t.y}) : ${t.army} biomasse${t.city ? " 🏡" : ""}`);
                 });
                 break;
             }

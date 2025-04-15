@@ -4,9 +4,9 @@ export default class Player {
         this.id = id;
         this.territories = [];
 
-        this.biomass = 50; // unités biologiques (à la place de army)
-        this.resources = 100; // énergie / nutriments
-        this.gold = 50; // reste comme monnaie spéciale (pour bâtiments)
+        this.biomass = Math.floor(Math.random*1000); // unités de croissance
+        this.resources = Math.floor(Math.random*1000); // énergie / nutriments
+        this.gold = Math.floor(Math.random*100); // pour la construction
     }
 
     addTerritory(territory) {
@@ -27,7 +27,7 @@ export default class Player {
         this.gold += goldGain;
         this.biomass += biomassGain;
 
-        console.log(`🧬 ${this.name} a absorbé : +${energyGain} énergie, +${biomassGain} biomasse, +${goldGain} or`);
+        console.log(`🦠 ${this.name} a absorbé : +${energyGain} énergie, +${biomassGain} biomasse, +${goldGain} or`);
     }
 
     toString() {
