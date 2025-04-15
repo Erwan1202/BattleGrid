@@ -149,8 +149,8 @@ export default class Game {
 
     
 
-    executeCommand(cmd) {
-        const parser = new CommandParser(this);
+    executeCommand(cmd, hasPlayed = false) {
+        const parser = new CommandParser(this, hasPlayed);
         return parser.execute(cmd);
     }
     
