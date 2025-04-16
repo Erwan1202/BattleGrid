@@ -1,11 +1,8 @@
 export default class Territory {
-    constructor(x, y){
-        this.x = x;
-        this.y = y;
-        this.owner = null;
-        this.army = 0;
-        this.resources = 0;
-        this.construction = 0; 
+    constructor(name, owner, units) {
+        this.name = name;
+        this.owner = owner;
+        this.units = units;
     }
 
     buildCity() {
@@ -19,6 +16,7 @@ export default class Territory {
     changeOwner(newOwner) {
         this.owner = newOwner;
     }
+
 
     addUnits(n) {
         this.army += n;

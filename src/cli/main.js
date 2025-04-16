@@ -1,8 +1,8 @@
 /* eslint-env node */
 
-import Game from "../core/game.js";
+import Game from "../components/game.js";
 import promptSync from "prompt-sync";
-import Bot from "../core/bot.js";
+import Bot from "../components/bot.js";
 const prompt = promptSync(); // Initialisation de prompt-sync
 
 const game = new Game(5, 5, "Erwan");
@@ -14,11 +14,10 @@ function delay(ms) {
 
 // Injecter une stratégie IA aléatoire à chaque bot
 for (const bot of game.bots) {
-    bot.play = function(game) {
+    bot.setStrategy(function (game) {
         const map = game.map;
         const action = Math.random();
 
-        // 0 - 0.4 : expansion, 0.4 - 0.7 : construction, > 0.7 : rien
         if (action < 0.4) {
             for (const t of this.territories) {
                 const neighbors = map.getNeighbours(t.x, t.y).filter(n => n.owner !== this);
@@ -62,7 +61,7 @@ for (const bot of game.bots) {
         }
 
         console.log(`💤 ${this.name} ne fait rien ce tour.`);
-    };
+    });
 }
 
 async function playTurn() {
@@ -84,7 +83,7 @@ async function playTurn() {
 
         while (true) {
             const cmd = prompt(`🧠 [${player.name}] Commande > `);
-            const result = game.executeCommand(cmd.trim(), hasPlayed);
+            const result = game.executeCommand(cmd.trim());
 
             if (result === "end") {
                 game.currentPlayerIndex = (game.currentPlayerIndex + 1) % game.players.length;
@@ -101,7 +100,6 @@ async function playTurn() {
             } else if (result === "invalid") {
                 console.log("❌ Commande invalide. Essayez à nouveau.");
             } else if (result === "neutral") {
-                // commande neutre comme 'status'
                 continue;
             } else {
                 console.log("❌ Résultat de commande inconnu.");

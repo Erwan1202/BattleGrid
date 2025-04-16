@@ -1,155 +1,100 @@
-import GameMap from "./map.js";
-//import Territory from "./territory";
-import Player from "./player.js";
-import Bot from "./bot.js";
-//import readline from "readline";
-import CommandParser from "./commandParseur.js";
-
+// src/core/Game.js
+import Player from "./Player";
+import Bot from "./Bot";
+import GameMap from "./GameMap";
 
 export default class Game {
-    constructor(width, height, playerName) {
-        this.map = new GameMap(width, height);
-        this.players = [new Player(playerName, 1)];
-        this.currentPlayerIndex = 0;
-        this.gameOver = false;
-        this.turn = 1;
-        this.bots = [];
-        this.initBots(3); 
-    }
+  constructor(width, height, playerName) {
+    this.map = new GameMap(width, height);
+    this.players = [new Player(playerName, 1)];
+    this.bots = [];
+    this.currentPlayerIndex = 0;
+    this.turn = 1;
+    this.initBots(3);
+    this.initPlayerPosition();
+  }
 
-    initBots(numBots) {
-        for (let i = 0; i < numBots; i++) {
-            const botName = `Bot ${i + 1}`;
-            const bot = new Bot(botName, i + 1);
-            this.bots.push(bot);
-            this.players.push(bot);
-        }
+  initBots(n) {
+    for (let i = 0; i < n; i++) {
+      const bot = new Bot(`Bot ${i + 1}`, i + 2);
+      bot.setStrategy();
+      this.bots.push(bot);
+      this.players.push(bot);
     }
+  }
 
-    startGame() {
-        this.gameLoop();
+  initPlayerPosition() {
+    const all = this.map.getAllTerritories();
+    const empty = all.filter(t => !t.owner);
+    for (let i = 0; i < this.players.length; i++) {
+      const spot = empty.splice(Math.floor(Math.random() * empty.length), 1)[0];
+      spot.changeOwner(this.players[i]);
+      spot.addUnits(5);
+      this.players[i].addTerritory(spot);
     }
+  }
 
-    gameLoop() {
-        while (!this.gameOver) {
-            this.playTurn();
-            this.turn++;
-        }
+  getCurrentPlayer() {
+    return this.players[this.currentPlayerIndex];
+  }
+
+  spread(player, x, y) {
+    const t = this.map.getTerritory(x, y);
+    if (!t) return { status: "invalid", message: "Territoire invalide." };
+    const isAdjacent = this.map.getNeighbours(x, y).some(n => n.owner === player);
+    if (!isAdjacent) return { status: "invalid", message: "Pas adjacent." };
+    if (t.owner === player) return { status: "invalid", message: "Déjà contrôlé." };
+    if (player.resources < 10) return { status: "invalid", message: "Pas assez de ressources." };
+
+    if (t.owner && t.owner !== player) {
+      if (t.army < 2) {
+        t.owner.removeTerritory(t);
+        t.changeOwner(player);
+        t.army = 1;
+        player.addTerritory(t);
+        player.resources -= 10;
+        return { status: "valid", message: `Attaque réussie sur (${x},${y})` };
+      } else {
+        return { status: "invalid", message: `Trop bien défendu.` };
+      }
+    } else {
+      t.changeOwner(player);
+      t.addUnits(1);
+      player.addTerritory(t);
+      player.resources -= 10;
+      return { status: "valid", message: `Expansion vers (${x},${y})` };
     }
+  }
 
-    playTurn() {
-        const currentPlayer = this.players[this.currentPlayerIndex];
-        console.log(`\n🎲 Tour ${this.turn} — ${currentPlayer.name}`);
-        currentPlayer.collectIncome();
-    
-        if (currentPlayer instanceof Player) {
-            this.map.printMap();
-            if (currentPlayer instanceof Player) {
-                this.map.printMap();
-                console.log(`🧠 [${currentPlayer.name}] à toi de jouer.`);
-                return;
-            }
-            
-            return; // attendre commande utilisateur
-        }
-    
-        if (this.bots.includes(currentPlayer)) {
-            this.botTurn(currentPlayer);
-        }
-    
-        this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.players.length;
-        if (this.currentPlayerIndex === 0) this.turn++;
-        setTimeout(() => this.playTurn(), 1000);
+  build(player, x, y) {
+    const t = this.map.getTerritory(x, y);
+    if (t && t.owner === player && !t.city && player.gold >= 50) {
+      t.buildCity();
+      player.gold -= 50;
+      return { status: "valid", message: `Ville construite à (${x},${y})` };
     }
-    
-    playerLogic(player) {
-        console.log(`[${player.name}] Tour ${this.turn}: Logique du joueur exécutée`);
-    }
+    return { status: "invalid", message: "Construction impossible." };
+  }
 
-    checkGameOver() {
-        return this.players.filter(p => p.territories.length > 0).length <= 1;
-    }
+  endTurn() {
+    this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.players.length;
+    if (this.currentPlayerIndex === 0) this.turn++;
+  }
 
-    getCurrentPlayer() {
-        return this.players[this.currentPlayerIndex];
-    }
+  playBotTurn() {
+    const bot = this.getCurrentPlayer();
+    if (!(bot instanceof Bot)) return;
+    bot.collectIncome();
+    const res = bot.play(this.map);
+    this.endTurn();
+    return res;
+  }
 
-    init() {
-        console.log("Initialisation du jeu...");
-    
-        const player = this.players[0];
-        const all = this.map.getAllTerritories();
-        const empty = all.filter(t => t.owner === null);
-        const rand = empty[Math.floor(Math.random() * empty.length)];
-        rand.changeOwner(player);
-        rand.addUnits(5);
-        player.addTerritory(rand);
-    
-        // Initialisation des bots
-        this.bots.forEach(bot => {
-            const available = this.map.getAllTerritories().filter(t => t.owner === null);
-            const pos = available[Math.floor(Math.random() * available.length)];
-            pos.changeOwner(bot);
-            pos.addUnits(3);
-            bot.addTerritory(pos);
-        });
-    
-        this.players.forEach(p => {
-            console.log(`Joueur: ${p.name}`);
-        });
-    
-        console.log("Bots initialisés:");
-        this.bots.forEach(bot => {
-            console.log(`Bot: ${bot.name}`);
-        });
-    
-        this.map.printMap();
-        console.log("Jeu prêt à commencer !");
-    }
+  collectIncome() {
+    this.getCurrentPlayer().collectIncome();
+  }
 
-    botTurn(bot) {
-        console.log(`🤖 ${bot.name} réfléchit...`);
-        bot.collectIncome();
-        const map = this.map;
-    
-        let expanded = false;
-        for (const t of bot.territories) {
-            const neighbors = map.getNeighbours(t.x, t.y).filter(n => !n.owner);
-            if (neighbors.length && bot.resources >= 10) {
-                const choice = neighbors[Math.floor(Math.random() * neighbors.length)];
-                choice.changeOwner(bot);
-                choice.addUnits(1);
-                bot.addTerritory(choice);
-                bot.resources -= 10;
-                console.log(`🤖 ${bot.name} étend son territoire vers (${choice.x},${choice.y})`);
-                expanded = true;
-                break;
-            }
-        }
-    
-        if (!expanded) {
-            console.log(`🤖 ${bot.name} ne trouve pas d'endroit à étendre.`);
-        }
-    
-        // Essaye de construire une ville
-        for (const t of bot.territories) {
-            if (!t.city && bot.gold >= 50) {
-                t.buildCity();
-                bot.gold -= 50;
-                console.log(`🏗️ ${bot.name} construit une ville à (${t.x}, ${t.y})`);
-                break;
-            }
-        }
-    
-        map.printMap();
-    }
-
-
-    
-
-    executeCommand(cmd, hasPlayed = false) {
-        const parser = new CommandParser(this, hasPlayed);
-        return parser.execute(cmd);
-    }
-    
+  getMap() {
+    return this.map.toDisplay();
+  }
 }

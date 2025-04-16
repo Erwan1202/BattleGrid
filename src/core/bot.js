@@ -1,6 +1,4 @@
-import Player from './player.js';
-
-
+import Player from "./player";
 export default class Bot extends Player {
     constructor(name, id) {
         super(name, id);
@@ -10,6 +8,12 @@ export default class Bot extends Player {
         this.resources = Math.floor(Math.random() * 1000) + 1;
         this.gold = Math.floor(Math.random() * 1000) + 1;
     }
+
+    setStrategy() {
+        // Implementation for setting the strategy of the bot.
+        // Placeholder for now, but logic will be required here.
+        console.log(`${this.name} strategy is set.`);
+      }
 
     game_logic() {
         console.log("Bot logic executed");
