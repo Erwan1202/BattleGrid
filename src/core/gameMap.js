@@ -40,4 +40,9 @@ export default class GameMap {
     getAllTerritories() {
         return this.grid.flat();
     }
+    getGrid() {
+        return this.grid;
+    }
+
+    
 }

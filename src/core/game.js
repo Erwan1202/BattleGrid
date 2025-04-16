@@ -1,7 +1,7 @@
 // src/core/Game.js
-import Player from "./Player";
-import Bot from "./Bot";
-import GameMap from "./GameMap";
+import Player from "./player";
+import Bot from "./bot";
+import GameMap from "./gameMap";
 
 export default class Game {
   constructor(width, height, playerName) {
@@ -17,7 +17,9 @@ export default class Game {
   initBots(n) {
     for (let i = 0; i < n; i++) {
       const bot = new Bot(`Bot ${i + 1}`, i + 2);
-      bot.setStrategy();
+      if (typeof bot.setStrategy === "function") {
+        bot.setStrategy();
+      }
       this.bots.push(bot);
       this.players.push(bot);
     }
@@ -27,10 +29,13 @@ export default class Game {
     const all = this.map.getAllTerritories();
     const empty = all.filter(t => !t.owner);
     for (let i = 0; i < this.players.length; i++) {
+      const player = this.players[i];
       const spot = empty.splice(Math.floor(Math.random() * empty.length), 1)[0];
-      spot.changeOwner(this.players[i]);
-      spot.addUnits(5);
-      this.players[i].addTerritory(spot);
+      if (spot && typeof spot.changeOwner === "function") {
+        spot.changeOwner(player);
+        spot.addUnits(5);
+        player.addTerritory(spot);
+      }
     }
   }
 

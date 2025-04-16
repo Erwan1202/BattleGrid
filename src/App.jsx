@@ -7,7 +7,7 @@ import Footer from "./components/Footer";
 
 export default function App() {
   const [game] = useState(() => new Game(5, 5, "Erwan"));
-  const [map, setMap] = useState(game.map.getGrid()); // pour affichage
+  const [map, setMap] = useState(game.map.getGrid());
   const [log, setLog] = useState([]);
   const [ setTurn] = useState(1);
   const [input, setInput] = useState("");
